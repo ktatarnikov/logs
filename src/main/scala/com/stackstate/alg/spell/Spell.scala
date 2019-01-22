@@ -2,9 +2,11 @@ package com.stackstate.alg.spell
 
 import java.util.UUID
 
+import com.stackstate.alg.logs.LogSplitter.{LogLine, LogLineSplitter}
 import com.stackstate.alg.spell.Spell.{LogLineType, TokenSeq, _}
 
 import scala.annotation.tailrec
+import scala.collection.immutable.{ListMap, TreeMap}
 
 object Spell {
 
@@ -112,6 +114,7 @@ object Spell {
               }
             case _ => None
           }
+        case (head :: Nil, None) => None
 
         case (head :: tail, Some(template)) =>
           template.logLineType match {
@@ -131,10 +134,6 @@ object Spell {
 
   case class LogLineType(template: TokenSeq, eventType: EventType = UUID.randomUUID()) {
     def templateWithoutWildCards: TokenSeq = template.filter(_ != "*")
-  }
-
-  trait LogLineSplitter {
-    def split(logLine: String): TokenSeq
   }
 
   def lcs(seq1: TokenSeq, seq2: TokenSeq): TokenSeq = {
@@ -192,82 +191,86 @@ object Spell {
 
 case class Spell(splitter: LogLineSplitter,
                  tau: Double = 0.5f,
-                 clusters: Map[UUID, LogLineType] = Map.empty,
+                 clusters: IndexedSeq[LogLineType] = IndexedSeq.empty,
                  prefixTree: Node = Node()) {
 
-  def parse(logLine: String): (Spell, EventType) = {
-    val tokenSeq = splitter.split(logLine)
-    val constantSeq = tokenSeq.flatMap {
-      case "*" => Seq.empty
-      case other => Seq(other)
-    }
+  def parse(text: String): (Spell, EventType, LogLine) = {
+    val logLine = splitter.split(text)
+    val tokenSeq = logLine.contents
+    val constantSeq = tokenSeq.filter(_ != "*")
+
     matchPrefixTree(constantSeq)
-      .orElse(matchTypeDirect(constantSeq))
-      .orElse(matchLcs(constantSeq))
+      .orElse(matchTypeDirect(this.clusters, constantSeq))
+      .orElse(matchLcs(this.clusters, constantSeq))
       .fold {
         val newType = LogLineType(tokenSeq)
 
         (
           this.copy(
-            clusters = clusters + (newType.eventType -> newType),
+            clusters = clusters :+ newType,
             prefixTree = prefixTree.add(newType)
           ),
-          newType.eventType
+          newType.eventType,
+          logLine
         )
       } { logLineType =>
         val newTemplate = getTemplate(lcs(tokenSeq, logLineType.template), logLineType.template)
-        if (newTemplate.equals(logLineType.template)) {
+        if (!newTemplate.equals(logLineType.template)) {
           val newLogline = logLineType.copy(newTemplate)
 
           (
             this.copy(
-              clusters = clusters + (newLogline.eventType -> newLogline),
+              clusters = clusters :+ newLogline,
               prefixTree = prefixTree.remove(logLineType).add(newLogline)
             ),
-            newLogline.eventType
+            newLogline.eventType,
+            logLine
           )
         } else
-          (this, logLineType.eventType)
+          (this, logLineType.eventType, logLine)
       }
   }
 
-  def matchTypeDirect(constantSeq: TokenSeq): Option[LogLineType] = {
+  def matchTypeDirect(clusters: IndexedSeq[LogLineType], constantSeq: TokenSeq): Option[LogLineType] = {
     val seq = constantSeq.toSet
 
     def matchCluster(logLineType: LogLineType): Boolean = {
-      logLineType.template.size >= 0.5 * seq.size &&
-        logLineType.template.forall(token => seq.contains(token) || "*".equals(token))
+      logLineType.template.size >= this.tau * seq.size &&
+        logLineType.template.forall(token => seq.contains(token) || "*" == token)
     }
 
-    this.clusters.values.find(matchCluster)
+    clusters.find(matchCluster)
   }
 
-  def matchPrefixTree(constantSeq: TokenSeq): Option[LogLineType] = {
+  protected def matchPrefixTree(constantSeq: TokenSeq): Option[LogLineType] = {
     prefixTree.matchSeq(constantSeq, this.tau)
   }
 
-  def matchLcs(constantSeq: TokenSeq): Option[LogLineType] = {
+  def matchLcs(clusters: IndexedSeq[LogLineType], constantSeq: TokenSeq): Option[LogLineType] = {
     val seq = constantSeq.toSet
 
+    case class MaxCluster(logLineType: Option[LogLineType] = None, length: Int = -1)
+
     val maxCluster =
-      this.clusters.values.foldLeft(Option.empty[LogLineType]) { (currentMax, logLineType) =>
+      clusters.foldLeft(MaxCluster()) { (max, logLineType) =>
         val template = logLineType.template.toSet
-        if (template.size < 0.5 * seq.size) {
-          currentMax
+        if (template.intersect(seq).size < 0.5 * seq.size) {
+          max
         } else {
           val lcsSeq = lcs(constantSeq, logLineType.template)
-          val currentMaxLength = currentMax.map(_.template.size).getOrElse(0)
-          val lcsMoreThanCurrentMax = lcsSeq.size > currentMaxLength
-          val smallerTemplate = lcsSeq.size == currentMaxLength && logLineType.template.size < currentMaxLength
-          if (lcsMoreThanCurrentMax || smallerTemplate)
-            Some(logLineType)
-          else
-            currentMax
+          val lcsMoreThanCurrentMax = lcsSeq.size > max.length
+          val smallerTemplate = lcsSeq.size == max.length && logLineType.template.size < max.logLineType.map(_.template.size).getOrElse(0)
+          if (lcsMoreThanCurrentMax || smallerTemplate) {
+            max.copy(
+              logLineType = Some(logLineType),
+              length = lcsSeq.size
+            )
+          } else
+            max
         }
       }
-    maxCluster.flatMap { logLineType =>
-      val lcsSeq = lcs(constantSeq, logLineType.template)
-      if (lcsSeq.size > this.tau * seq.size)
+    maxCluster.logLineType.flatMap { logLineType =>
+      if (maxCluster.length >= this.tau * constantSeq.size)
         Some(logLineType)
       else
         None

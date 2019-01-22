@@ -18,6 +18,10 @@ class PrefixTreeSpec extends WordSpec {
       root.remove(LogLineType(seq("ABCD"))) shouldBe root
     }
 
+    "handle matchedSeq against empty tree" in {
+      Node().matchSeq(seq("ABCD")) shouldBe None
+    }
+
     "handle adding and matching of one element sequence to the tree" in {
       val tree = Node().add(line("A", id1))
       tree.matchSeq(seq("A")) shouldBe Some(line("A", id1))
