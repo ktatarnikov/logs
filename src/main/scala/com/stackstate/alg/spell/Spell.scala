@@ -132,12 +132,13 @@ object Spell {
     if (lcs.isEmpty)
       IndexedSeq.empty
     else {
+
       def recourse(seq: List[String], lcs: List[String]): List[String] = {
         (seq, lcs) match {
           case (Nil, _) => Nil
           case (h, Nil) => "*" :: Nil
-          case (h :: t, lcsSeq) if h == lcsSeq.head => h :: recourse(t, lcs.tail)
-          case (_ :: t, lcsSeq) => "*" :: recourse(t, lcsSeq)
+          case (h :: t, lcsSeq) if h == lcsSeq.head => h :: recourse(t, lcsSeq.tail)
+          case (h :: t, lcsSeq) if h != lcsSeq.head => "*" :: recourse(t, lcsSeq)
         }
       }
 
