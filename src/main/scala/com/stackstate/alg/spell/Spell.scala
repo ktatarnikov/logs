@@ -101,7 +101,7 @@ object Spell {
     val dp = Array.ofDim[Int](seq1.length + 1, seq2.length + 1)
     for (i <- 1 to seq1.length) {
       for (j <- 1 to seq2.length) {
-        if (seq1(i) == seq2(j)) {
+        if (seq1(i - 1) == seq2(j - 1)) {
           dp(i)(j) = 1 + dp(i - 1)(j - 1)
         } else {
           dp(i)(j) = Math.max(dp(i - 1)(j), dp(i)(j - 1))
@@ -111,8 +111,8 @@ object Spell {
 
     @tailrec
     def recourse(current: List[String], len1: Int, len2: Int): TokenSeq = {
-      if (len1 == 0 && len2 == 0)
-        current.toIndexedSeq.reverse
+      if (len1 == 0 || len2 == 0)
+        current.toIndexedSeq
       else {
         if (dp(len1)(len2) == dp(len1 - 1)(len2)) {
           recourse(current, len1 - 1, len2)
