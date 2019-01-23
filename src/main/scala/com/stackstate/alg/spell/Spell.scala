@@ -187,11 +187,9 @@ object Spell {
 
 }
 
-//case class EventTypes(clusters: Map[UUID, LogLineType] = Map.empty, prefixTree: Tree = Node()) {}
-
 case class Spell(splitter: LogLineSplitter,
                  tau: Double = 0.5f,
-                 clusters: IndexedSeq[LogLineType] = IndexedSeq.empty,
+                 clusters: Set[LogLineType] = Set.empty,
                  prefixTree: Node = Node()) {
 
   def parse(text: String): (Spell, EventType, LogLine) = {
@@ -207,7 +205,7 @@ case class Spell(splitter: LogLineSplitter,
 
         (
           this.copy(
-            clusters = clusters :+ newType,
+            clusters = clusters + newType,
             prefixTree = prefixTree.add(newType)
           ),
           newType.eventType,
@@ -217,11 +215,11 @@ case class Spell(splitter: LogLineSplitter,
         val newTemplate = getTemplate(lcs(tokenSeq, logLineType.template), logLineType.template)
         if (!newTemplate.equals(logLineType.template)) {
           val removedTree = prefixTree.remove(logLineType)
-          val removedClusters = clusters.filter(_ != logLineType)
+          val removedClusters = clusters - logLineType
           val newLogline = logLineType.copy(newTemplate)
           (
             this.copy(
-              clusters = removedClusters :+ newLogline,
+              clusters = removedClusters + newLogline,
               prefixTree = removedTree.add(newLogline)
             ),
             newLogline.eventType,
@@ -232,7 +230,7 @@ case class Spell(splitter: LogLineSplitter,
       }
   }
 
-  def matchTypeDirect(clusters: IndexedSeq[LogLineType], constantSeq: TokenSeq): Option[LogLineType] = {
+  def matchTypeDirect(clusters: Set[LogLineType], constantSeq: TokenSeq): Option[LogLineType] = {
     val seq = constantSeq.toSet
 
     def matchCluster(logLineType: LogLineType): Boolean = {
@@ -247,7 +245,7 @@ case class Spell(splitter: LogLineSplitter,
     prefixTree.matchSeq(constantSeq, this.tau)
   }
 
-  def matchLcs(clusters: IndexedSeq[LogLineType], constantSeq: TokenSeq): Option[LogLineType] = {
+  def matchLcs(clusters: Set[LogLineType], constantSeq: TokenSeq): Option[LogLineType] = {
     val seq = constantSeq.toSet
 
     case class MaxCluster(logLineType: Option[LogLineType] = None, length: Int = -1)

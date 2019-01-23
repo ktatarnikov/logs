@@ -55,7 +55,7 @@ class MatchLcsSpec extends WordSpec {
     //TODO max template template
   }
 
-  def clusters(logLineTypes: LogLineType*): IndexedSeq[LogLineType] = logLineTypes.toIndexedSeq
+  def clusters(logLineTypes: LogLineType*): Set[LogLineType] = logLineTypes.toSet
 
   def line(seqStr: String, id: UUID = UUID.randomUUID()): LogLineType = LogLineType(seq(seqStr), id)
   def list(seqStr: String): List[String] = seq(seqStr).toList

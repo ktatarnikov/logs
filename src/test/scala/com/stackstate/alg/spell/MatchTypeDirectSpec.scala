@@ -18,7 +18,7 @@ class MatchTypeDirectSpec extends WordSpec {
   val spell = Spell(null, tau = 0.5)
   "matchTypeDirect" should {
     "not match empty clusters" in {
-      spell.matchTypeDirect(IndexedSeq.empty, seq("A")) shouldBe None
+      spell.matchTypeDirect(Set.empty, seq("A")) shouldBe None
     }
 
     "match one cluster map" in {
@@ -38,7 +38,7 @@ class MatchTypeDirectSpec extends WordSpec {
     }
   }
 
-  def clusters(logLineTypes: LogLineType*): IndexedSeq[LogLineType] = logLineTypes.toIndexedSeq
+  def clusters(logLineTypes: LogLineType*): Set[LogLineType] = logLineTypes.toSet
 
   def line(seqStr: String, id: UUID = UUID.randomUUID()): LogLineType = LogLineType(seq(seqStr), id)
   def list(seqStr: String): List[String] = seq(seqStr).toList
