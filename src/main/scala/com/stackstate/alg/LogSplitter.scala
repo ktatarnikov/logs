@@ -1,7 +1,7 @@
-package com.stackstate.alg.logs
+package com.stackstate.alg
 
-import com.stackstate.alg.logs.LogSplitter.{LogLine, LogLineSplitter, generateRegexp, splitIntoTokens}
-import com.stackstate.alg.spell.TokenSeq
+import com.stackstate.alg.LogSplitter._
+import com.stackstate.alg.log._
 
 import scala.util.matching.Regex
 

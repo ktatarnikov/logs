@@ -1,5 +1,7 @@
 package com.stackstate.alg.spell
 
+import com.stackstate.alg.log._
+
 object PrefixTree {
 
   case class PrefixTreeNode(children: Map[Token, PrefixTreeNode] = Map(), logNum: Int = 0, logLineType: Option[LogLineType] = None) {

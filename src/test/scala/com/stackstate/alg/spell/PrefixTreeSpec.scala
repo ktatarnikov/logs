@@ -5,6 +5,7 @@ import java.util.UUID
 import com.stackstate.alg.spell.PrefixTree.PrefixTreeNode
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
+import com.stackstate.alg.log._
 
 class PrefixTreeSpec extends WordSpec {
 

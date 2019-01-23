@@ -1,6 +1,6 @@
 package com.stackstate.alg.spell
 
-import com.stackstate.alg.logs.LogSplitter
+import com.stackstate.alg.LogSplitter
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
 

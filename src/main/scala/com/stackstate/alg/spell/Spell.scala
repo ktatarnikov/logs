@@ -1,9 +1,9 @@
 package com.stackstate.alg.spell
 
-import com.stackstate.alg.logs.LogSplitter.{LogLine, LogLineSplitter}
+import com.stackstate.alg.LogSplitter._
 import com.stackstate.alg.spell.PrefixTree.PrefixTreeNode
 import com.stackstate.alg.spell.Spell._
-
+import com.stackstate.alg.log._
 import scala.annotation.tailrec
 
 object Spell {

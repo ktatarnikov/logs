@@ -2,7 +2,7 @@ package com.stackstate.alg
 
 import java.util.UUID
 
-package object spell {
+package object log {
 
   type Token = String
   type TokenSeq = IndexedSeq[Token]

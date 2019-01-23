@@ -1,8 +1,9 @@
 package com.stackstate.alg.spell
 
-import com.stackstate.alg.logs.LogSplitter.{LogLine, LogLineSplitter}
+import com.stackstate.alg.LogSplitter._
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
+import com.stackstate.alg.log._
 
 class SpellSpec extends WordSpec {
 

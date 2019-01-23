@@ -2,8 +2,9 @@ package com.stackstate.alg.spell
 
 import java.io.{File, PrintWriter}
 
-import com.stackstate.alg.logs.LogSplitter
-import com.stackstate.alg.logs.LogSplitter.LogLine
+import com.stackstate.alg.LogSplitter
+import com.stackstate.alg.log._
+import com.stackstate.alg.LogSplitter._
 
 import scala.io.Source
 
