@@ -2,12 +2,8 @@ package com.stackstate.alg.spell
 
 import java.util.UUID
 
-import com.stackstate.alg.spell.Spell._
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
-
-import scala.collection.immutable
-import scala.collection.immutable.ListMap
 
 class MatchLcsSpec extends WordSpec {
   val logA = line("A")
@@ -58,7 +54,9 @@ class MatchLcsSpec extends WordSpec {
   def clusters(logLineTypes: LogLineType*): Set[LogLineType] = logLineTypes.toSet
 
   def line(seqStr: String, id: UUID = UUID.randomUUID()): LogLineType = LogLineType(seq(seqStr), id)
-  def list(seqStr: String): List[String] = seq(seqStr).toList
+
   def seq(seqStr: String): TokenSeq = seqStr.map(_.toString)
+
+  def list(seqStr: String): List[String] = seq(seqStr).toList
 
 }

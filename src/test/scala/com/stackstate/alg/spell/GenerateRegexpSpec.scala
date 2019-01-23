@@ -1,8 +1,7 @@
 package com.stackstate.alg.spell
 
-import com.stackstate.alg.logs.LogSplitter
-import org.scalatest.Matchers._
 import com.stackstate.alg.logs.LogSplitter._
+import org.scalatest.Matchers._
 import org.scalatest.WordSpec
 
 class GenerateRegexpSpec extends WordSpec {

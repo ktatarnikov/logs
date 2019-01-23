@@ -7,9 +7,9 @@ scalaVersion := "2.12.8"
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
 
 libraryDependencies ++= {
-  val akkaV       = "2.5.3"
-  val akkaHttpV   = "10.0.9"
-  val scalaTestV  = "3.0.1"
+  val akkaV = "2.5.3"
+  val akkaHttpV = "10.0.9"
+  val scalaTestV = "3.0.1"
   Seq(
     "org.apache.commons" % "commons-csv" % "1.5",
     "com.google.guava" % "guava" % "21.0",
@@ -19,8 +19,8 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-http" % akkaHttpV,
     "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpV,
     "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpV,
-    "org.scalatest"     %% "scalatest" % scalaTestV % "test",
-    "org.scalacheck"    %% "scalacheck" % "1.14.0" % "test"
+    "org.scalatest" %% "scalatest" % scalaTestV % "test",
+    "org.scalacheck" %% "scalacheck" % "1.14.0" % "test"
   )
 }
 

@@ -1,16 +1,13 @@
 package com.stackstate.alg.logs
 
 import com.stackstate.alg.logs.LogSplitter.{LogLine, LogLineSplitter, generateRegexp, splitIntoTokens}
-import com.stackstate.alg.spell.Spell.TokenSeq
+import com.stackstate.alg.spell.TokenSeq
 
 import scala.util.matching.Regex
 
 object LogSplitter {
-  trait LogLineSplitter {
-    def split(logLine: String): LogLine
-  }
 
-  case class LogLine(headers: Map[String, String], contents: TokenSeq)
+  val TokenizeContentRegExp = "[\\s=:,]".r
 
   def generateRegexp(format: String): (List[String], Regex) = {
     var prev = 0
@@ -40,29 +37,35 @@ object LogSplitter {
     (headers, result)
   }
 
-  val TokenizeContentRegExp = "[\\s=:,]".r
   def splitIntoTokens(text: String): TokenSeq = {
     TokenizeContentRegExp.split(text).filter(!_.isEmpty).toIndexedSeq
   }
+
+  trait LogLineSplitter {
+    def split(logLine: String): LogLine
+  }
+
+  case class LogLine(headers: Map[String, String], contents: TokenSeq)
 }
 
 class LogSplitter(format: String, contentsGroup: String = "Content") extends LogLineSplitter {
   val (headers, regex) = generateRegexp(format)
+
   override def split(logLine: String): LogLine = {
     regex.findAllMatchIn(logLine).map(m => {
       headers.foldLeft(LogLine(Map.empty, IndexedSeq())) { (acc, groupName) => {
 
-          val contents =
-            if (groupName == contentsGroup)
-              Some(splitIntoTokens(m.group(groupName)))
-            else
-              None
+        val contents =
+          if (groupName == contentsGroup)
+            Some(splitIntoTokens(m.group(groupName)))
+          else
+            None
 
-          acc.copy(
-            acc.headers + (groupName -> m.group(groupName)),
-            contents.getOrElse(acc.contents)
-          )
-        }
+        acc.copy(
+          acc.headers + (groupName -> m.group(groupName)),
+          contents.getOrElse(acc.contents)
+        )
+      }
       }
     }).next()
   }

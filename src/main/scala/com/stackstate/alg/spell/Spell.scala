@@ -1,142 +1,14 @@
 package com.stackstate.alg.spell
 
-import java.util.UUID
-
 import com.stackstate.alg.logs.LogSplitter.{LogLine, LogLineSplitter}
-import com.stackstate.alg.spell.Spell.{LogLineType, TokenSeq, _}
+import com.stackstate.alg.spell.PrefixTree.PrefixTreeNode
+import com.stackstate.alg.spell.Spell._
 
 import scala.annotation.tailrec
-import scala.collection.immutable.{ListMap, TreeMap}
 
 object Spell {
 
-  type Token = String
-  type TokenSeq = IndexedSeq[Token]
-  type EventType = UUID
-
-  case class Node(children: Map[Token, Node] = Map(), logNum: Int = 0, logLineType: Option[LogLineType] = None) {
-
-    def addLeaf(logLineType: LogLineType) : Node = {
-      this.copy(
-        logLineType = this.logLineType.orElse(Some(logLineType)),
-        logNum = this.logNum + 1
-      )
-    }
-
-    def removeLeaf(logLineType: LogLineType) : Node = {
-      if (this.logLineType.contains(logLineType)) {
-        this.copy(
-          logLineType = None,
-          logNum = logNum - 1
-        )
-      } else {
-        this.copy(logNum = logNum - 1)
-      }
-    }
-
-    def add(logLineType: LogLineType): Node = this.add(logLineType, logLineType.templateWithoutWildCards.toList)
-    def remove(logLineType: LogLineType): Node = this.remove(logLineType, logLineType.templateWithoutWildCards.toList)
-    def matchSeq(seq: TokenSeq, tau: Double = 0.0): Option[LogLineType] = this.matchSeq(seq.toList, seq.size, tau)
-
-    private def add(logLineType: LogLineType, seq: List[Token]): Node = {
-
-      (seq, children.get(seq.head)) match {
-        case (head :: Nil, Some(child)) =>
-          val newChild = child.addLeaf(logLineType)
-          this.copy(
-            children = children.updated(head, newChild),
-            logNum = logNum + 1,
-          )
-
-        case (head :: Nil, None) =>
-          this.copy(
-            children = children.updated(head, Node().addLeaf(logLineType)),
-            logNum = logNum + 1,
-          )
-
-        case (head :: tail, Some(child)) =>
-          this.copy(
-            children = children.updated(head, child.add(logLineType, tail)),
-            logNum = logNum + 1
-          )
-
-        case (head :: tail, None) =>
-          val newNode = Node().add(logLineType, tail)
-          this.copy(
-            children = children.updated(head, newNode),
-            logNum = logNum + 1
-          )
-      }
-    }
-
-    private def remove(logLineType: LogLineType, seq: List[String]): Node = {
-      (seq, children.get(seq.head)) match {
-        case (head :: Nil, Some(template)) =>
-          val newLeaf = template.removeLeaf(logLineType)
-          if (newLeaf.logNum == 0) {
-            this.copy(
-              children = children - head,
-              logNum = logNum - 1
-            )
-          } else {
-            this.copy(
-              children = children.updated(head, newLeaf),
-              logNum = logNum - 1
-            )
-          }
-        case (head :: tail, Some(template)) =>
-          val withRemoved = template.remove(logLineType, tail)
-          if (withRemoved.logNum == 0) {
-            this.copy(
-              children = children - head,
-              logNum = logNum - 1
-            )
-          } else {
-            this.copy(
-              children = children.updated(head, withRemoved),
-              logNum = logNum - 1
-            )
-          }
-        case _ => this
-      }
-    }
-
-    private def matchSeq(seq: List[String], originalLength: Int, tau: Double): Option[LogLineType] = {
-      (seq, children.get(seq.head)) match {
-        case (Nil, _) => None
-        case (head :: Nil, Some(template)) =>
-          template.logLineType match {
-            case Some(theType) =>
-              if (theType.templateWithoutWildCards.size.toDouble >= tau * originalLength) {
-                Some(theType)
-              } else {
-                None
-              }
-            case _ => None
-          }
-        case (head :: Nil, None) => None
-
-        case (head :: tail, Some(template)) =>
-          template.logLineType match {
-            case Some(theType) =>
-              if (theType.templateWithoutWildCards.size.toDouble >= tau * originalLength) {
-                Some(theType)
-              } else {
-                template.matchSeq(tail, originalLength, tau)
-              }
-            case None => template.matchSeq(tail, originalLength, tau)
-          }
-        case (head :: tail, None) =>
-          matchSeq(tail, originalLength, tau)
-      }
-    }
-  }
-
-  case class LogLineType(template: TokenSeq, eventType: EventType = UUID.randomUUID()) {
-    def templateWithoutWildCards: TokenSeq = template.filter(_ != "*")
-  }
-
-  def lcs(seq1: TokenSeq, seq2: TokenSeq): TokenSeq = {
+  def longestCommonSubseq(seq1: TokenSeq, seq2: TokenSeq): TokenSeq = {
     val dp = Array.ofDim[Int](seq1.length + 1, seq2.length + 1)
     for (i <- 1 to seq1.length) {
       for (j <- 1 to seq2.length) {
@@ -166,7 +38,6 @@ object Spell {
     recourse(List.empty, seq1.length, seq2.length)
   }
 
-
   def getTemplate(lcs: TokenSeq, seq: TokenSeq): TokenSeq = {
     if (lcs.isEmpty)
       IndexedSeq.empty
@@ -184,13 +55,12 @@ object Spell {
       recourse(seq.toList, lcs.toList).toIndexedSeq
     }
   }
-
 }
 
 case class Spell(splitter: LogLineSplitter,
                  tau: Double = 0.5f,
                  clusters: Set[LogLineType] = Set.empty,
-                 prefixTree: Node = Node()) {
+                 prefixTree: PrefixTreeNode = PrefixTreeNode()) {
 
   def parse(text: String): (Spell, EventType, LogLine) = {
     val logLine = splitter.split(text)
@@ -212,17 +82,17 @@ case class Spell(splitter: LogLineSplitter,
           logLine
         )
       } { logLineType =>
-        val newTemplate = getTemplate(lcs(tokenSeq, logLineType.template), logLineType.template)
+        val newTemplate = getTemplate(longestCommonSubseq(tokenSeq, logLineType.template), logLineType.template)
         if (!newTemplate.equals(logLineType.template)) {
-          val removedTree = prefixTree.remove(logLineType)
-          val removedClusters = clusters - logLineType
-          val newLogline = logLineType.copy(newTemplate)
+          val treeWithoutType = prefixTree.remove(logLineType)
+          val clustersWithoutType = clusters - logLineType
+          val updatedLogType = logLineType.copy(newTemplate)
           (
             this.copy(
-              clusters = removedClusters + newLogline,
-              prefixTree = removedTree.add(newLogline)
+              clusters = clustersWithoutType + updatedLogType,
+              prefixTree = treeWithoutType.add(updatedLogType)
             ),
-            newLogline.eventType,
+            updatedLogType.eventType,
             logLine
           )
         } else
@@ -256,7 +126,7 @@ case class Spell(splitter: LogLineSplitter,
         if (template.intersect(seq).size < 0.5 * seq.size) {
           max
         } else {
-          val lcsSeq = lcs(constantSeq, logLineType.template)
+          val lcsSeq = longestCommonSubseq(constantSeq, logLineType.template)
           val lcsMoreThanCurrentMax = lcsSeq.size > max.length
           val smallerTemplate = lcsSeq.size == max.length && logLineType.template.size < max.logLineType.map(_.template.size).getOrElse(0)
           if (lcsMoreThanCurrentMax || smallerTemplate) {
