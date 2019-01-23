@@ -216,12 +216,13 @@ case class Spell(splitter: LogLineSplitter,
       } { logLineType =>
         val newTemplate = getTemplate(lcs(tokenSeq, logLineType.template), logLineType.template)
         if (!newTemplate.equals(logLineType.template)) {
+          val removedTree = prefixTree.remove(logLineType)
+          val removedClusters = clusters.filter(_ != logLineType)
           val newLogline = logLineType.copy(newTemplate)
-
           (
             this.copy(
-              clusters = clusters :+ newLogline,
-              prefixTree = prefixTree.remove(logLineType).add(newLogline)
+              clusters = removedClusters :+ newLogline,
+              prefixTree = removedTree.add(newLogline)
             ),
             newLogline.eventType,
             logLine
