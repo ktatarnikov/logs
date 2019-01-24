@@ -6,6 +6,7 @@ import PrefixTree.PrefixTreeNode
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
 import com.logprocessing.log._
+import com.logprocessing.alg.TestSupport._
 
 class PrefixTreeSpec extends WordSpec {
 
@@ -15,8 +16,7 @@ class PrefixTreeSpec extends WordSpec {
 
   "prefix tree" should {
     "handle deleted from empty tree" in {
-      val root = PrefixTreeNode()
-      root.remove(LogLineType(seq("ABCD"))) shouldBe root
+      PrefixTreeNode().remove(LogLineType(seq("ABCD"))) shouldBe PrefixTreeNode()
     }
 
     "handle matchedSeq against empty tree" in {
@@ -135,10 +135,5 @@ class PrefixTreeSpec extends WordSpec {
 
   }
 
-  def line(seqStr: String, id: UUID): LogLineType = LogLineType(seq(seqStr), id)
-
-  def list(seqStr: String): List[String] = seq(seqStr).toList
-
-  def seq(seqStr: String): TokenSeq = seqStr.map(_.toString)
 }
 

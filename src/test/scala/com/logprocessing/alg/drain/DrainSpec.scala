@@ -11,7 +11,7 @@ class DrainSpec extends WordSpec {
   val simpleSplitter: LogLineSplitter = (logLine: String) => LogLine(Map.empty, logLine.split(" "))
   var drain = new DrainWrapper(Drain(simpleSplitter))
 
-  "spell" should {
+  "drain" should {
     "create log line types" in {
       val eventType1 = drain.parse("A B C D")
       val eventType2 = drain.parse("E F G H")

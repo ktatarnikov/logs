@@ -1,6 +1,6 @@
 package com.logprocessing.alg.drain
 
-import com.logprocessing.alg.drain.PrefixTree.{fastMatch, hasNumbers}
+import com.logprocessing.alg.drain.PrefixTree.{fastMatch, hasNumbers, mapOfTrees}
 import com.logprocessing.log.{LogLineType, TokenSeq}
 
 object PrefixTree {
@@ -50,9 +50,14 @@ object PrefixTree {
   }
 
   def hasNumbers(token: String): Boolean = "[0-9]+".r.findFirstMatchIn(token).exists(_ => true)
+
+  def mapOfTrees(sequenceMax: Int) : Map[Int, PrefixTreeNode] =
+    (1 to sequenceMax).map(i => i -> PrefixTreeNode()).toMap
 }
 
-case class SequenceTreeRoot(seqTrees: Map[Int, PrefixTreeNode] = Map(), maxChild : Int) {
+case class SequenceTreeRoot(seqTrees: Map[Int, PrefixTreeNode] = mapOfTrees(10), maxChild : Int = 100) {
+
+  def clusters: Set[LogLineType] = seqTrees.values.flatMap(_.clusters).toSet
 
   def add(newLogLine: LogLineType): SequenceTreeRoot = {
     val templateLength = newLogLine.template.size
@@ -63,7 +68,7 @@ case class SequenceTreeRoot(seqTrees: Map[Int, PrefixTreeNode] = Map(), maxChild
           seqTrees = seqTrees.updated(templateLength, tree.add(newLogLine, newLogLine.template.toList, 1))
         )
       case None =>
-        val newNode = PrefixTreeNode(maxChild = maxChild).add(newLogLine, newLogLine.template.toList, 1)
+        val newNode = PrefixTreeNode(token = "root", maxChild = maxChild).add(newLogLine, newLogLine.template.toList, 1)
         this.copy(
           seqTrees = seqTrees.updated(templateLength, newNode)
         )
@@ -76,14 +81,14 @@ case class SequenceTreeRoot(seqTrees: Map[Int, PrefixTreeNode] = Map(), maxChild
     seqTrees.get(templateLength) match {
       case Some(tree) =>
         this.copy(
-          seqTrees = seqTrees.updated(templateLength, tree.remove(newLogLine))
+          seqTrees = seqTrees.updated(templateLength, tree.remove(newLogLine, newLogLine.template.toList, 1))
         )
       case None =>
         this
     }
   }
 
-  def search(tokenSeq: TokenSeq, similarityThreshold: Double): Option[LogLineType] = {
+  def search(tokenSeq: TokenSeq, similarityThreshold: Double = 0.4): Option[LogLineType] = {
     seqTrees
       .get(tokenSeq.size)
       .flatMap(tree => {
@@ -98,8 +103,10 @@ case class SequenceTreeRoot(seqTrees: Map[Int, PrefixTreeNode] = Map(), maxChild
 case class PrefixTreeNode(children: Map[String, PrefixTreeNode] = Map(),
                           clusters: Set[LogLineType] = Set.empty,
                           token: String = "",
-                          depth: Int = 0,
-                          maxChild: Int) {
+                          depth: Int = 1,
+                          maxChild: Int = 100) {
+
+  def add(newLogLine: LogLineType): PrefixTreeNode = add(newLogLine, newLogLine.template.toList, 1)
 
   def add(newLogLine: LogLineType, tokenSeq: List[String], currentDepth: Int): PrefixTreeNode = {
     tokenSeq match {
@@ -116,14 +123,18 @@ case class PrefixTreeNode(children: Map[String, PrefixTreeNode] = Map(),
               )
 
             case (None, None) if hasNumbers(token) =>
-              val newNode = PrefixTreeNode(token = "<*>", maxChild = maxChild).add(newLogLine, tail, currentDepth + 1)
+              val newNode =
+                PrefixTreeNode(token = "<*>", maxChild = maxChild, depth = currentDepth + 1)
+                  .add(newLogLine, tail, currentDepth + 1)
               this.copy(
                 children = children.updated("<*>", newNode)
               )
 
             case (None, Some(wildcard)) if !hasNumbers(token) =>
               if (this.children.size < maxChild) {
-                val newNode = PrefixTreeNode(token = token, maxChild = maxChild).add(newLogLine, tail, currentDepth + 1)
+                val newNode =
+                  PrefixTreeNode(token = token, maxChild = maxChild, depth = currentDepth + 1)
+                    .add(newLogLine, tail, currentDepth + 1)
                 this.copy(
                   children = children.updated(token, newNode)
                 )
@@ -135,13 +146,17 @@ case class PrefixTreeNode(children: Map[String, PrefixTreeNode] = Map(),
 
             case (None, None) if !hasNumbers(token) =>
               if (this.children.size + 1 < maxChild) {
-                val newNode = PrefixTreeNode(token = token, maxChild = maxChild).add(newLogLine, tail, currentDepth + 1)
+                val newNode =
+                  PrefixTreeNode(token = token, maxChild = maxChild, depth = currentDepth + 1)
+                    .add(newLogLine, tail, currentDepth + 1)
                 this.copy(
                   children = children.updated(token, newNode)
                 )
 
               } else if(this.children.size + 1 == maxChild) {
-                val newNode = PrefixTreeNode(token = "<*>", maxChild = maxChild).add(newLogLine, tail, currentDepth + 1)
+                val newNode =
+                  PrefixTreeNode(token = "<*>", maxChild = maxChild, depth = currentDepth + 1)
+                    .add(newLogLine, tail, currentDepth + 1)
                 this.copy(
                   children = children.updated("<*>", newNode)
                 )
@@ -163,16 +178,44 @@ case class PrefixTreeNode(children: Map[String, PrefixTreeNode] = Map(),
         }
       case Nil => ???
     }
-
   }
 
-  def remove(newLogLine: LogLineType): PrefixTreeNode = {
-    this
+  def remove(newLogLine: LogLineType): PrefixTreeNode = remove(newLogLine, newLogLine.template.toList, 1)
+
+  def remove(newLogLine: LogLineType, tokenSeq: List[String], currentDepth: Int): PrefixTreeNode = {
+    tokenSeq match {
+      case head :: tail =>
+        if (currentDepth >= this.depth || currentDepth > newLogLine.template.size) {
+          this.copy(
+            clusters = this.clusters - newLogLine
+          )
+        } else {
+          (children.get(head), children.get("<*>")) match {
+            case (Some(child), Some(wildcard)) =>
+              this.copy(
+                children =
+                  children
+                    .updated(head, child.remove(newLogLine, tail, currentDepth + 1))
+                    .updated("<*>", wildcard.remove(newLogLine, tail, currentDepth + 1))
+              )
+
+            case (None, Some(wildcard)) =>
+              this.copy(
+                children = children.updated("<*>", wildcard.remove(newLogLine, tail, currentDepth + 1))
+              )
+
+            case (_, _) => this
+          }
+        }
+      case Nil => ???
+    }
   }
+
+  def search(tokenSeq: TokenSeq): Option[Set[LogLineType]] = this.search(tokenSeq.toList, 1, tokenSeq.size, None)
 
   def search(tokenSeq: List[String], currentDepth: Int, seqLen: Int, currentMatch: Option[Set[LogLineType]]): Option[Set[LogLineType]] = {
     if (currentDepth >= this.depth || currentDepth > seqLen) {
-      currentMatch
+      currentMatch.orElse(Some(this.clusters))
     } else {
       tokenSeq match {
         case head :: tail =>

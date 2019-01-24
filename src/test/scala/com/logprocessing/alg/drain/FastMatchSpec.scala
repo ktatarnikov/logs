@@ -1,10 +1,7 @@
 package com.logprocessing.alg.drain
 
-import java.util.UUID
-
+import com.logprocessing.alg.TestSupport._
 import com.logprocessing.alg.drain.PrefixTree.fastMatch
-import com.logprocessing.log.{LogLineType, TokenSeq}
-import org.scalatest.WordSpec
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
 
@@ -21,13 +18,5 @@ class FastMatchSpec extends WordSpec {
       //TODO tests
     }
   }
-
-  def clusters(logLineTypes: LogLineType*): Set[LogLineType] = logLineTypes.toSet
-
-  def line(seqStr: String, id: UUID = UUID.randomUUID()): LogLineType = LogLineType(seq(seqStr), id)
-
-  def seq(seqStr: String): TokenSeq = seqStr.map(_.toString)
-
-  def list(seqStr: String): List[String] = seq(seqStr).toList
 
 }

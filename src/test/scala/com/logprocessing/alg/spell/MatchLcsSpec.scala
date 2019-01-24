@@ -4,6 +4,7 @@ import java.util.UUID
 import com.logprocessing.log._
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
+import com.logprocessing.alg.TestSupport._
 
 class MatchLcsSpec extends WordSpec {
   val logA = line("A")
@@ -50,13 +51,5 @@ class MatchLcsSpec extends WordSpec {
     //TODO smaller template
     //TODO max template template
   }
-
-  def clusters(logLineTypes: LogLineType*): Set[LogLineType] = logLineTypes.toSet
-
-  def line(seqStr: String, id: UUID = UUID.randomUUID()): LogLineType = LogLineType(seq(seqStr), id)
-
-  def seq(seqStr: String): TokenSeq = seqStr.map(_.toString)
-
-  def list(seqStr: String): List[String] = seq(seqStr).toList
 
 }

@@ -1,36 +1,23 @@
 package com.logprocessing.alg.spell
 
-import java.io.{File, PrintWriter}
-
-import com.logprocessing.alg.LogSplitter
+import com.logprocessing.alg.DemoAppBase
 import com.logprocessing.log._
-import com.logprocessing.alg.LogSplitter._
 
-import scala.io.Source
+object SpellDemo extends DemoAppBase {
+  case class ParseResult(spell: Spell, typed: IndexedSeq[LineAndType])
 
-object SpellDemo extends App {
-  val logFormat = "<Date> <Time> <Pid> <Level> <Component>: <Content>"
-  val logSplitter = new LogSplitter(logFormat)
-  val spell = new Spell(logSplitter)
-  val stream = ClassLoader.getSystemResourceAsStream("HDFS_2k.log")
-  val logLines = Source.fromInputStream(stream).getLines.toList
-  val result =
-    logLines.foldLeft(ParseResult(spell, IndexedSeq.empty)) { (acc, line) =>
-      val (spell, eventType, logLine) = acc.spell.parse(line)
-      acc.copy(
-        spell,
-        acc.typed :+ LoglineAndType(logLine, eventType)
-      )
-    }
-  val marked = new PrintWriter(new File("./HDFS_2k.marked.log"))
-  val clusters = new PrintWriter(new File("./HDFS_2k.clusters.log"))
+  override def name = "spell"
 
-  case class LoglineAndType(logline: LogLine, eventType: EventType)
-  result.typed.foreach(row => marked.write(s"${row.eventType} ${row.logline.contents.mkString(" ")}\n"))
-  marked.close()
-
-  case class ParseResult(spell: Spell, typed: IndexedSeq[LoglineAndType])
-  result.spell.clusters.foreach(row => clusters.write(s"${row.eventType} ${row.template.mkString(" ")}\n"))
-  clusters.close()
+  override def execute(lines: Seq[String]): (Set[LogLineType], IndexedSeq[LineAndType]) = {
+    val result =
+      logLines.foldLeft(ParseResult(new Spell(logSplitter), IndexedSeq.empty)) { (acc, line) =>
+        val (drain, eventType, logLine) = acc.spell.parse(line)
+        acc.copy(
+          drain,
+          acc.typed :+ LineAndType(logLine, eventType)
+        )
+      }
+    (result.spell.clusters, result.typed)
+  }
 
 }

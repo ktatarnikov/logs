@@ -2,8 +2,6 @@ package com.logprocessing.alg.spell
 
 import com.logprocessing.alg.LogSplitter.{LogLine, LogLineSplitter}
 import com.logprocessing.alg.spell.PrefixTree.PrefixTreeNode
-import com.logprocessing.alg.LogSplitter._
-import com.logprocessing.alg.spell.PrefixTree.PrefixTreeNode
 import com.logprocessing.alg.spell.Spell._
 import com.logprocessing.log._
 

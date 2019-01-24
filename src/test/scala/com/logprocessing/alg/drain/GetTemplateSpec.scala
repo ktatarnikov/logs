@@ -12,13 +12,13 @@ class GetTemplateSpec extends WordSpec {
     "handle basic cases correctly" in {
       getTemplate(IndexedSeq(), IndexedSeq()) shouldBe IndexedSeq()
       getTemplate(IndexedSeq("A"), IndexedSeq("A")) shouldBe IndexedSeq("A")
-      getTemplate(IndexedSeq("A"), IndexedSeq("B")) shouldBe IndexedSeq("*")
+      getTemplate(IndexedSeq("A"), IndexedSeq("B")) shouldBe IndexedSeq("<*>")
 
       getTemplate(IndexedSeq("A", "B"), IndexedSeq("A", "B")) shouldBe IndexedSeq("A", "B")
-      getTemplate(IndexedSeq("B", "C"), IndexedSeq("A", "C")) shouldBe IndexedSeq("*", "C")
-      getTemplate(IndexedSeq("A", "B"), IndexedSeq("A", "C")) shouldBe IndexedSeq("A", "*")
+      getTemplate(IndexedSeq("B", "C"), IndexedSeq("A", "C")) shouldBe IndexedSeq("<*>", "C")
+      getTemplate(IndexedSeq("A", "B"), IndexedSeq("A", "C")) shouldBe IndexedSeq("A", "<*>")
 
-      getTemplate(IndexedSeq("A", "B", "C"), IndexedSeq("X", "B", "Z")) shouldBe IndexedSeq("*", "B", "*")
+      getTemplate(IndexedSeq("A", "B", "C"), IndexedSeq("X", "B", "Z")) shouldBe IndexedSeq("<*>", "B", "<*>")
 
     }
   }

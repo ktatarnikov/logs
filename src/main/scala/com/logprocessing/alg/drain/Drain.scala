@@ -1,7 +1,6 @@
 package com.logprocessing.alg.drain
 
 import com.logprocessing.alg.LogSplitter.{LogLine, LogLineSplitter}
-import com.logprocessing.alg.LogSplitter.{LogLine, LogLineSplitter}
 import com.logprocessing.alg.drain.Drain.getTemplate
 import com.logprocessing.log.{EventType, LogLineType, TokenSeq}
 
@@ -9,7 +8,7 @@ import com.logprocessing.log.{EventType, LogLineType, TokenSeq}
 object Drain {
   def getTemplate(sequence1: TokenSeq, sequence2: TokenSeq): TokenSeq = {
     if (sequence1.size != sequence2.size) {
-      throw new RuntimeException(s"Sequences $sequence1 and $sequence2 are not alinged.")
+      throw new RuntimeException(s"Sequences $sequence1 and $sequence2 are not aligned.")
     }
 
     def recourse(seq1: List[String], seq2: List[String]): List[String] = {
@@ -17,7 +16,7 @@ object Drain {
         case (Nil, _) => Nil
         case (_, Nil) => Nil
         case (h1 :: t1, h2 :: t2) if h1 == h2 => h1 :: recourse(t1, t2)
-        case (h1 :: t1, h2 :: t2) if h1 != h2 => "*" :: recourse(t1, t2)
+        case (h1 :: t1, h2 :: t2) if h1 != h2 => "<*>" :: recourse(t1, t2)
       }
     }
 
@@ -28,13 +27,16 @@ object Drain {
 
 
 case class Drain(splitter: LogLineSplitter,
-                 tree: SequenceTreeRoot = SequenceTreeRoot(maxChild = 100),
+                 tree: SequenceTreeRoot = SequenceTreeRoot(),
                  depth: Int = 4,
                  similarityThreshold : Double = 0.4) {
+
+  def clusters: Set[LogLineType] = tree.clusters
 
   def parse(text: String): (Drain, EventType, LogLine) = {
     val logLine = splitter.split(text)
     val tokenSeq = logLine.contents
+
     tree.search(tokenSeq, similarityThreshold) match {
       case Some(logLineType) =>
         val templateSeq = getTemplate(tokenSeq, logLineType.template)

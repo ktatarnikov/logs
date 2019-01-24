@@ -1,4 +1,4 @@
-package com.logprocessing.alg.spell
+package com.logprocessing.alg
 
 import com.logprocessing.alg.LogSplitter._
 import org.scalatest.Matchers._

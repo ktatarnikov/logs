@@ -36,6 +36,7 @@ object PrefixTree {
             children = children.updated(head, newNode),
             logNum = logNum + 1
           )
+        case (_, _) => this
       }
     }
 

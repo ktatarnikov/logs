@@ -1,7 +1,6 @@
 package com.logprocessing.alg.spell
 
-import java.util.UUID
-import com.logprocessing.log._
+import com.logprocessing.alg.TestSupport._
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
 
@@ -34,14 +33,5 @@ class MatchTypeDirectSpec extends WordSpec {
       spell.matchTypeDirect(cls, seq("BCA")).get shouldBe logAB
     }
   }
-
-  def clusters(logLineTypes: LogLineType*): Set[LogLineType] = logLineTypes.toSet
-
-  def line(seqStr: String, id: UUID = UUID.randomUUID()): LogLineType = LogLineType(seq(seqStr), id)
-
-  def list(seqStr: String): List[String] = seq(seqStr).toList
-
-  def seq(seqStr: String): TokenSeq = seqStr.map(_.toString)
-
 
 }
