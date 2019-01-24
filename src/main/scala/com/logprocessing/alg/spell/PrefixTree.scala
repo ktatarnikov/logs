@@ -4,9 +4,12 @@ import com.logprocessing.log._
 
 object PrefixTree {
 
-  case class PrefixTreeNode(children: Map[Token, PrefixTreeNode] = Map(), logNum: Int = 0, logLineType: Option[LogLineType] = None) {
+  case class PrefixTreeNode(children: Map[Token, PrefixTreeNode] = Map(),
+                            logNum: Int = 0,
+                            logLineType: Option[LogLineType] = None) {
 
-    def add(logLineType: LogLineType): PrefixTreeNode = this.add(logLineType, logLineType.templateWithoutWildCards.toList)
+    def add(logLineType: LogLineType): PrefixTreeNode =
+      this.add(logLineType, logLineType.templateWithoutWildCards.toList)
 
     private def add(logLineType: LogLineType, seq: List[Token]): PrefixTreeNode = {
 
@@ -48,7 +51,8 @@ object PrefixTree {
     }
 
 
-    def remove(logLineType: LogLineType): PrefixTreeNode = this.remove(logLineType, logLineType.templateWithoutWildCards.toList)
+    def remove(logLineType: LogLineType): PrefixTreeNode =
+      this.remove(logLineType, logLineType.templateWithoutWildCards.toList)
 
     private def remove(logLineType: LogLineType, seq: List[String]): PrefixTreeNode = {
       (seq, children.get(seq.head)) match {
@@ -93,7 +97,8 @@ object PrefixTree {
       }
     }
 
-    def matchSeq(seq: TokenSeq, tau: Double = 0.0): Option[LogLineType] = this.matchSeq(seq.toList, seq.size, tau)
+    def matchSeq(seq: TokenSeq, tau: Double = 0.0): Option[LogLineType] =
+      this.matchSeq(seq.toList, seq.size, tau)
 
     private def matchSeq(seq: List[String], originalLength: Int, tau: Double): Option[LogLineType] = {
       (seq, children.get(seq.head)) match {
