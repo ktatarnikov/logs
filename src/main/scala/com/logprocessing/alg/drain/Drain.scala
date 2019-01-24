@@ -28,10 +28,9 @@ object Drain {
 
 
 case class Drain(splitter: LogLineSplitter,
-                 tree: SequenceTreeRoot = SequenceTreeRoot(),
+                 tree: SequenceTreeRoot = SequenceTreeRoot(maxChild = 100),
                  depth: Int = 4,
-                 similarityThreshold : Double = 0.4,
-                 maxChild: Int = 100) {
+                 similarityThreshold : Double = 0.4) {
 
   def parse(text: String): (Drain, EventType, LogLine) = {
     val logLine = splitter.split(text)
