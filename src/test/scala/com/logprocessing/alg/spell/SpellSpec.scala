@@ -1,9 +1,9 @@
-package com.stackstate.alg.spell
+package com.logprocessing.alg.spell
 
-import com.stackstate.alg.LogSplitter._
+import com.logprocessing.alg.LogSplitter._
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
-import com.stackstate.alg.log._
+import com.logprocessing.log._
 
 class SpellSpec extends WordSpec {
 

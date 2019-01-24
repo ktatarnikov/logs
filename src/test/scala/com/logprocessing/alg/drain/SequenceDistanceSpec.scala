@@ -1,6 +1,6 @@
-package com.stackstate.alg.drain
+package com.logprocessing.alg.drain
 
-import com.stackstate.alg.drain.PrefixTree.sequenceDistance
+import com.logprocessing.alg.drain.PrefixTree.sequenceDistance
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
 

@@ -1,11 +1,11 @@
-package com.stackstate.alg.spell
+package com.logprocessing.alg.spell
 
 import java.util.UUID
 
-import com.stackstate.alg.spell.PrefixTree.PrefixTreeNode
+import PrefixTree.PrefixTreeNode
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
-import com.stackstate.alg.log._
+import com.logprocessing.log._
 
 class PrefixTreeSpec extends WordSpec {
 

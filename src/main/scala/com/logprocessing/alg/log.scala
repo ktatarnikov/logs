@@ -1,4 +1,4 @@
-package com.stackstate.alg
+package com.logprocessing
 
 import java.util.UUID
 

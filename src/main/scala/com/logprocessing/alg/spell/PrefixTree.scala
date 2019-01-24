@@ -1,6 +1,6 @@
-package com.stackstate.alg.spell
+package com.logprocessing.alg.spell
 
-import com.stackstate.alg.log._
+import com.logprocessing.log._
 
 object PrefixTree {
 

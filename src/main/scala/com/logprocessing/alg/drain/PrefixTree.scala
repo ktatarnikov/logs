@@ -1,7 +1,7 @@
-package com.stackstate.alg.drain
+package com.logprocessing.alg.drain
 
-import com.stackstate.alg.drain.PrefixTree.fastMatch
-import com.stackstate.alg.log.{LogLineType, TokenSeq}
+import com.logprocessing.alg.drain.PrefixTree.fastMatch
+import com.logprocessing.log.{LogLineType, TokenSeq}
 
 object PrefixTree {
 
@@ -101,7 +101,7 @@ case class PrefixTreeNode(children: Map[String, PrefixTreeNode] = Map(),
 
   def add(newLogLine: LogLineType): PrefixTreeNode = {
 
-    
+
     this
   }
 

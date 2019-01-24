@@ -1,7 +1,7 @@
-package com.stackstate.alg.spell
+package com.logprocessing.alg.spell
 
 import java.util.UUID
-import com.stackstate.alg.log._
+import com.logprocessing.log._
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
 

@@ -1,10 +1,10 @@
-package com.stackstate.alg.spell
+package com.logprocessing.alg.spell
 
 import java.io.{File, PrintWriter}
 
-import com.stackstate.alg.LogSplitter
-import com.stackstate.alg.log._
-import com.stackstate.alg.LogSplitter._
+import com.logprocessing.alg.LogSplitter
+import com.logprocessing.log._
+import com.logprocessing.alg.LogSplitter._
 
 import scala.io.Source
 

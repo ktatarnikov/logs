@@ -1,10 +1,10 @@
-package com.stackstate.alg.drain
+package com.logprocessing.alg.drain
 
-import com.stackstate.alg.LogSplitter._
+import com.logprocessing.alg.LogSplitter._
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
-import com.stackstate.alg.log._
-import com.stackstate.alg.drain.Drain.getTemplate
+import com.logprocessing.log._
+import Drain.getTemplate
 
 class GetTemplateSpec extends WordSpec {
 

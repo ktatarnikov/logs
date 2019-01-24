@@ -1,6 +1,6 @@
-package com.stackstate.alg.spell
+package com.logprocessing.alg.spell
 
-import com.stackstate.alg.spell.Spell._
+import Spell._
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
 

@@ -1,7 +1,7 @@
-package com.stackstate.alg
+package com.logprocessing.alg
 
-import com.stackstate.alg.LogSplitter._
-import com.stackstate.alg.log._
+import LogSplitter._
+import com.logprocessing.log._
 
 import scala.util.matching.Regex
 

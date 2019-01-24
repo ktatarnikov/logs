@@ -1,8 +1,9 @@
-package com.stackstate.alg.drain
+package com.logprocessing.alg.drain
 
-import com.stackstate.alg.LogSplitter.{LogLine, LogLineSplitter}
-import com.stackstate.alg.drain.Drain.getTemplate
-import com.stackstate.alg.log.{EventType, LogLineType, TokenSeq}
+import com.logprocessing.alg.LogSplitter.{LogLine, LogLineSplitter}
+import com.logprocessing.alg.LogSplitter.{LogLine, LogLineSplitter}
+import com.logprocessing.alg.drain.Drain.getTemplate
+import com.logprocessing.log.{EventType, LogLineType, TokenSeq}
 
 
 object Drain {

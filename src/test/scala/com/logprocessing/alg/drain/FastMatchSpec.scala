@@ -1,9 +1,9 @@
-package com.stackstate.alg.drain
+package com.logprocessing.alg.drain
 
 import java.util.UUID
 
-import com.stackstate.alg.drain.PrefixTree.fastMatch
-import com.stackstate.alg.log.{LogLineType, TokenSeq}
+import com.logprocessing.alg.drain.PrefixTree.fastMatch
+import com.logprocessing.log.{LogLineType, TokenSeq}
 import org.scalatest.WordSpec
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
