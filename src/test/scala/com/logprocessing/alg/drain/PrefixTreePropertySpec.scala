@@ -1,11 +1,9 @@
 package com.logprocessing.alg.drain
 
-import com.logprocessing.log.LogLineType
+import com.logprocessing.alg.TestSupport._
+import org.scalatest.AppendedClues._
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
-import org.scalatest.AppendedClues._
-import scala.util.Random
-import com.logprocessing.alg.TestSupport._
 
 class PrefixTreePropertySpec extends WordSpec {
 

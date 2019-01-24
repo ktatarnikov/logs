@@ -101,12 +101,12 @@ class PrefixTreeSpec extends WordSpec {
     }
 
     "handle matchedSeq against empty tree" in {
-      PrefixTreeNode().search(seq("ABCD")) shouldBe clusters()
+      PrefixTreeNode().search(seq("ABCD")) shouldBe Some(clusters())
     }
 
     "handle adding and matching of one element sequence to the tree" in {
       val tree = PrefixTreeNode().add(line("A", id1))
-      tree.search(seq("A")) shouldBe clusters(line("A", id1))
+      tree.search(seq("A")) shouldBe Some(clusters(line("A", id1)))
       tree.remove(line("A", id1)) shouldBe PrefixTreeNode()
     }
 
@@ -116,9 +116,9 @@ class PrefixTreeSpec extends WordSpec {
       val two = one.add(line("CD", id2))
       val tree = two.add(line("EF", id3))
 
-      tree.search(seq("AB")) shouldBe clusters(line("AB", id1), line("CD", id2), line("EF", id3))
-      tree.search(seq("CD")) shouldBe clusters(line("AB", id1), line("CD", id2), line("EF", id3))
-      tree.search(seq("EF")) shouldBe clusters(line("AB", id1), line("CD", id2), line("EF", id3))
+      tree.search(seq("AB")) shouldBe Some(clusters(line("AB", id1), line("CD", id2), line("EF", id3)))
+      tree.search(seq("CD")) shouldBe Some(clusters(line("AB", id1), line("CD", id2), line("EF", id3)))
+      tree.search(seq("EF")) shouldBe Some(clusters(line("AB", id1), line("CD", id2), line("EF", id3)))
 
       tree.remove(line("EF", id3)) shouldBe two
 
@@ -136,9 +136,9 @@ class PrefixTreeSpec extends WordSpec {
       val two = one.add(line("AC", id2))
       val tree = two.add(line("AD", id3))
 
-      tree.search(seq("AB")) shouldBe clusters(line("AB", id1), line("AC", id2), line("AD", id3))
-      tree.search(seq("AC")) shouldBe clusters(line("AB", id1), line("AC", id2), line("AD", id3))
-      tree.search(seq("AD")) shouldBe clusters(line("AB", id1), line("AC", id2), line("AD", id3))
+      tree.search(seq("AB")) shouldBe Some(clusters(line("AB", id1), line("AC", id2), line("AD", id3)))
+      tree.search(seq("AC")) shouldBe Some(clusters(line("AB", id1), line("AC", id2), line("AD", id3)))
+      tree.search(seq("AD")) shouldBe Some(clusters(line("AB", id1), line("AC", id2), line("AD", id3)))
 
       tree.remove(line("AD", id3)) shouldBe two
 
@@ -157,9 +157,9 @@ class PrefixTreeSpec extends WordSpec {
       val two = one.add(line("ABC", id2))
       val tree = two.add(line("ABE", id3))
 
-      tree.search(seq("ABD")) shouldBe clusters(line("ABD", id1), line("ABC", id2), line("ABE", id3))
-      tree.search(seq("ABC")) shouldBe clusters(line("ABD", id1), line("ABC", id2), line("ABE", id3))
-      tree.search(seq("ABE")) shouldBe clusters(line("ABD", id1), line("ABC", id2), line("ABE", id3))
+      tree.search(seq("ABD")) shouldBe Some(clusters(line("ABD", id1), line("ABC", id2), line("ABE", id3)))
+      tree.search(seq("ABC")) shouldBe Some(clusters(line("ABD", id1), line("ABC", id2), line("ABE", id3)))
+      tree.search(seq("ABE")) shouldBe Some(clusters(line("ABD", id1), line("ABC", id2), line("ABE", id3)))
 
       tree.remove(line("ABE", id3)) shouldBe two
 
