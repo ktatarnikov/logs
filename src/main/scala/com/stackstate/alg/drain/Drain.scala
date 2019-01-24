@@ -27,7 +27,7 @@ object Drain {
 
 
 case class Drain(splitter: LogLineSplitter,
-                 tree: PrefixTreeNode = PrefixTreeNode(),
+                 tree: SequenceTreeRoot = SequenceTreeRoot(),
                  depth: Int = 4,
                  similarityThreshold : Double = 0.4,
                  maxChild: Int = 100) {
