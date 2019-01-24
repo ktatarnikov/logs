@@ -2,7 +2,6 @@ package com.stackstate.alg.drain
 
 import com.stackstate.alg.LogSplitter.{LogLine, LogLineSplitter}
 import com.stackstate.alg.drain.Drain.getTemplate
-import com.stackstate.alg.drain.PrefixTree.PrefixTreeNode
 import com.stackstate.alg.log.{EventType, LogLineType, TokenSeq}
 
 
@@ -36,7 +35,7 @@ case class Drain(splitter: LogLineSplitter,
   def parse(text: String): (Drain, EventType, LogLine) = {
     val logLine = splitter.split(text)
     val tokenSeq = logLine.contents
-    tree.search(tokenSeq) match {
+    tree.search(tokenSeq, similarityThreshold) match {
       case Some(logLineType) =>
         val templateSeq = getTemplate(tokenSeq, logLineType.template)
         if (templateSeq != logLineType.template) {
