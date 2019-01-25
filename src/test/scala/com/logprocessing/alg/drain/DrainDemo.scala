@@ -16,7 +16,7 @@ object DrainDemo extends DemoAppBase {
     )
   override def execute(lines: Seq[String]): (Set[LogLineType], IndexedSeq[LineAndType]) = {
     val result =
-      logLines.foldLeft(ParseResult(new Drain(logSplitter, similarityThreshold = 0.5, depth = 4), IndexedSeq.empty)) { (acc, line) =>
+      logLines.foldLeft(ParseResult(Drain(logSplitter, depth = 4, similarityThreshold = 0.5), IndexedSeq.empty)) { (acc, line) =>
         val (drain, eventType, logLine) = acc.drain.parse(line)
         acc.copy(
           drain,

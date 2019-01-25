@@ -1,6 +1,7 @@
 package com.logprocessing.alg.drain
 
 import com.logprocessing.alg.TestSupport._
+import com.logprocessing.alg.drain.PrefixTree.mapOfTrees
 import org.scalatest.AppendedClues._
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
@@ -12,7 +13,7 @@ class PrefixTreePropertySpec extends WordSpec {
       val logLineTypes = generate(20000, 1, 10)
       println(s"Processing ${logLineTypes.size} logLineTypes.")
       var trees = List.empty[SequenceTreeRoot]
-      var tree = SequenceTreeRoot(maxChild = 50)
+      var tree = SequenceTreeRoot(maxDepth = 3, maxChild = 50, seqTrees = mapOfTrees(10, 3))
 
       for (logLineType <- logLineTypes) {
 //        tree.search(logLineType.template) shouldBe None withClue s"Searching for ${logLineType.template}"
@@ -31,7 +32,7 @@ class PrefixTreePropertySpec extends WordSpec {
         tree = tree.remove(logLineType)
 //        tree.search(logLineType.template) shouldBe None withClue s"Searching for ${logLineType.template}"
       }
-      tree shouldBe SequenceTreeRoot(maxChild = 50)
+      tree shouldBe SequenceTreeRoot(maxDepth = 3, maxChild = 50, seqTrees = mapOfTrees(10, 3))
     }
 
   }

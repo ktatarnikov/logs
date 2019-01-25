@@ -2,6 +2,7 @@ package com.logprocessing.alg.drain
 
 import com.logprocessing.alg.LogSplitter.{LogLine, LogLineSplitter}
 import com.logprocessing.alg.drain.Drain.getTemplate
+import com.logprocessing.alg.drain.PrefixTree.mapOfTrees
 import com.logprocessing.log.{EventType, LogLineType, TokenSeq}
 
 
@@ -23,13 +24,15 @@ object Drain {
     recourse(sequence1.toList, sequence2.toList).toIndexedSeq
   }
 
+  def apply(splitter: LogLineSplitter, depth: Int = 4, similarityThreshold: Double = 0.4): Drain = {
+    val maxDepth = depth - 2
+    Drain(splitter, SequenceTreeRoot(maxDepth = maxDepth, seqTrees = mapOfTrees(10, maxDepth)), similarityThreshold)
+  }
+
 }
 
 
-case class Drain(splitter: LogLineSplitter,
-                 tree: SequenceTreeRoot = SequenceTreeRoot(),
-                 depth: Int = 4,
-                 similarityThreshold : Double = 0.4) {
+case class Drain(splitter: LogLineSplitter, tree: SequenceTreeRoot, similarityThreshold: Double) {
 
   def clusters: Set[LogLineType] = tree.clusters
 

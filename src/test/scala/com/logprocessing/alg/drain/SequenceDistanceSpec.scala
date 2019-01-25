@@ -25,6 +25,8 @@ class SequenceDistanceSpec extends WordSpec {
       sequenceDistance(IndexedSeq("A", "B", "<*>"), IndexedSeq("A", "B", "C")) shouldBe (2.0/3.0, 1)
       sequenceDistance(IndexedSeq("<*>", "B", "<*>"), IndexedSeq("A", "B", "C")) shouldBe (1.0/3.0, 2)
       sequenceDistance(IndexedSeq("<*>", "<*>", "<*>"), IndexedSeq("A", "B", "C")) shouldBe (0, 3)
+
+      sequenceDistance(IndexedSeq("<*>", "<*>", "<*>"), IndexedSeq("<*>", "<*>", "<*>")) shouldBe (1, 3)
     }
   }
 }
