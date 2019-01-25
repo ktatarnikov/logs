@@ -12,10 +12,11 @@ trait DemoAppBase extends App {
   case class LineAndType(logLine: LogLine, eventType: EventType)
 
   def name : String
+  def preprocessRegexp: Set[String] = Set.empty
   def execute(lines: Seq[String]): (Set[LogLineType], IndexedSeq[LineAndType])
 
   val logFormat = "<Date> <Time> <Pid> <Level> <Component>: <Content>"
-  val logSplitter = new LogSplitter(logFormat)
+  val logSplitter = new LogSplitter(logFormat, preprocessRegexp)
 
   val stream = ClassLoader.getSystemResourceAsStream("HDFS_2k.log")
   val logLines = Source.fromInputStream(stream).getLines.toList

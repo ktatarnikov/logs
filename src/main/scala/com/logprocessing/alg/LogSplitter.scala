@@ -48,11 +48,24 @@ object LogSplitter {
   case class LogLine(headers: Map[String, String], contents: TokenSeq)
 }
 
-class LogSplitter(format: String, contentsGroup: String = "Content") extends LogLineSplitter {
+class LogSplitter(format: String,
+                  regexps: Set[String] = Set.empty,
+                  contentsGroup: String = "Content")
+  extends LogLineSplitter {
+  val preprocessRegexps = regexps.map(_.r)
   val (headers, regex) = generateRegexp(format)
 
+  def preprocess(line: String) : String = {
+    preprocessRegexps.foldLeft(line) { case (line, regexp) =>
+      regexp.replaceAllIn(line, "<*>")
+    }
+  }
+
   override def split(logLine: String): LogLine = {
-    regex.findAllMatchIn(logLine).map(m => {
+
+    val preprocessed = preprocess(logLine)
+
+    regex.findAllMatchIn(preprocessed).map(m => {
       headers.foldLeft(LogLine(Map.empty, IndexedSeq())) { (acc, groupName) => {
 
         val contents =

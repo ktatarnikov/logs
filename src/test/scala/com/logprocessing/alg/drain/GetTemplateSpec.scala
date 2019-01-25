@@ -1,10 +1,8 @@
 package com.logprocessing.alg.drain
 
-import com.logprocessing.alg.LogSplitter._
+import com.logprocessing.alg.drain.Drain.getTemplate
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
-import com.logprocessing.log._
-import Drain.getTemplate
 
 class GetTemplateSpec extends WordSpec {
 

@@ -8,9 +8,15 @@ object DrainDemo extends DemoAppBase {
   case class ParseResult(drain: Drain, typed: IndexedSeq[LineAndType])
 
   override def name = "drain"
+  override def preprocessRegexp =
+    Set(
+      "blk_(|-)[0-9]+",
+      "(/|)([0-9]+\\.){3}[0-9]+(:[0-9]+|)(:|)",
+      "(?<=[^A-Za-z0-9])(\\-?\\+?\\d+)(?=[^A-Za-z0-9])|[0-9]+$"
+    )
   override def execute(lines: Seq[String]): (Set[LogLineType], IndexedSeq[LineAndType]) = {
     val result =
-      logLines.foldLeft(ParseResult(new Drain(logSplitter), IndexedSeq.empty)) { (acc, line) =>
+      logLines.foldLeft(ParseResult(new Drain(logSplitter, similarityThreshold = 0.5, depth = 4), IndexedSeq.empty)) { (acc, line) =>
         val (drain, eventType, logLine) = acc.drain.parse(line)
         acc.copy(
           drain,
