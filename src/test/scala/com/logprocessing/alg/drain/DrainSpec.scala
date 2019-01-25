@@ -13,23 +13,24 @@ class DrainSpec extends WordSpec {
 
   "drain" should {
     "create log line types" in {
-      val eventType1 = drain.parse("A B C D")
-      val eventType2 = drain.parse("E F G H")
-      val eventType3 = drain.parse("X Y Z")
+      val eventType1 = drain.parse("A B C D E F G")
+      val eventType2 = drain.parse("H I J K L M N")
+      val eventType3 = drain.parse("O P Q R S")
+      val eventType4 = drain.parse("<*> <*> <*> <*> <*> <*> G")
       eventType2 shouldNot be(eventType1)
       eventType3 shouldNot be(eventType1)
       eventType3 shouldNot be(eventType2)
 
-      drain.parse("A B C D") shouldBe eventType1
-      drain.parse("A B C") shouldBe eventType1
-      drain.parse("A B") shouldBe eventType1
+      drain.parse("A B C D E F G") shouldBe eventType1
+      drain.parse("A B C M D E F") shouldBe eventType1
+      drain.parse("A B C 3 4 5 6") shouldBe eventType1
+      drain.parse("A B C D E F") shouldNot be(eventType1)
+      drain.parse("A B C D E 1") shouldNot be(eventType1)
+      drain.parse("A B C <*> <*> <*> G") shouldBe eventType1
 
-      drain.parse("E F G H") shouldBe eventType2
-      drain.parse("E F G") shouldBe eventType2
-      drain.parse("E F") shouldBe eventType2
+      drain.parse("<*> <*> <*> <*> <*> <*> G") shouldBe eventType4
+      drain.parse("<*> <*> <*> <*> <*> F G") shouldNot be(eventType4)
 
-      drain.parse("X Y Z") shouldBe eventType3
-      drain.parse("X Y") shouldBe eventType3
     }
   }
 

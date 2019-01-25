@@ -12,11 +12,11 @@ class PrefixTreePropertySpec extends WordSpec {
     "be able to add and remove 20K components and preserve tree invariant" in {
       val logLineTypes = generate(20000, 1, 10)
       println(s"Processing ${logLineTypes.size} logLineTypes.")
-      var trees = List.empty[SequenceTreeRoot]
-      var tree = SequenceTreeRoot(maxDepth = 3, maxChild = 50, seqTrees = mapOfTrees(10, 3))
+      val root = SequenceTreeRoot(maxDepth = 3, maxChild = 50, seqTrees = mapOfTrees(10, 3))
 
+      var trees = List.empty[SequenceTreeRoot]
+      var tree = root
       for (logLineType <- logLineTypes) {
-//        tree.search(logLineType.template) shouldBe None withClue s"Searching for ${logLineType.template}"
         tree = tree.add(logLineType)
         trees ::= tree
         tree.search(logLineType.template) shouldBe Some(logLineType) withClue s"Searching for ${logLineType.template}"
@@ -30,9 +30,8 @@ class PrefixTreePropertySpec extends WordSpec {
         trees = tail
         tree.search(logLineType.template) shouldBe Some(logLineType) withClue s"Searching for ${logLineType.template}"
         tree = tree.remove(logLineType)
-//        tree.search(logLineType.template) shouldBe None withClue s"Searching for ${logLineType.template}"
       }
-      tree shouldBe SequenceTreeRoot(maxDepth = 3, maxChild = 50, seqTrees = mapOfTrees(10, 3))
+      tree shouldBe root
     }
 
   }

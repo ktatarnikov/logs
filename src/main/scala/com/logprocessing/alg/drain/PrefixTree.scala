@@ -121,7 +121,7 @@ case class PrefixTreeNode(maxDepth: Int,
 
   def treeClusters: Set[LogLineType] = clusters ++ children.values.flatMap{ child => child.treeClusters ++ child.clusters }
 
-  def isEmpty : Boolean = children.size + clusters.size == 0
+  def isEmpty : Boolean = (children.size + clusters.size) == 0
 
   def add(newLogLine: LogLineType): PrefixTreeNode = add(newLogLine, newLogLine.template.toList, 1)
 
@@ -158,10 +158,8 @@ case class PrefixTreeNode(maxDepth: Int,
             case (None, None) if !hasNumbers(head) =>
               if (this.children.size + 1 < maxChild) {
                 addNewNode(head, tail, newLogLine, currentDepth)
-              } else if(this.children.size + 1 == maxChild) {
+              } else { //if(this.children.size + 1 >= maxChild) {
                 addNewNode("<*>", tail, newLogLine, currentDepth)
-              } else {
-                ???
               }
 
             case (Some(child), _) =>
@@ -240,6 +238,7 @@ case class PrefixTreeNode(maxDepth: Int,
             .fold(Option.empty[Set[LogLineType]]) { child =>
               child.search(tail, currentDepth + 1, seqLen, Some(child.clusters))
             }
+        case Nil => None
       }
     }
   }

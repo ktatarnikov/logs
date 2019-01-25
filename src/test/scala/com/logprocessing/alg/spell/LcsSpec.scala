@@ -19,6 +19,5 @@ class LcsSpec extends WordSpec {
       longestCommonSubseq(IndexedSeq("A", "B"), IndexedSeq("C", "B")) shouldBe IndexedSeq("B")
       longestCommonSubseq(IndexedSeq("A", "B", "C"), IndexedSeq("X", "B", "Y")) shouldBe IndexedSeq("B")
     }
-    //TODO add property based tests
   }
 }
