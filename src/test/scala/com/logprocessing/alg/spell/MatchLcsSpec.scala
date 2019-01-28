@@ -62,12 +62,11 @@ class MatchLcsSpec extends WordSpec {
     }
 
     "the matching clusters should be at least half of the sequence" in {
-      val log1 = line("ABCDEFGHIJ*M")
-      val log2 = line("ABCDEFGHIJK*M")
+      val log1 = line("ABCDEF")
+      val log2 = line("ABCDEFG")
       val cls = clusters(log1, log2)
 
-      spell.matchLcs(cls, seq("ABCDEFGHIJKLM")).get shouldBe log2
-      spell.matchLcs(cls, seq("ABCDEFGHIJKLM")).get shouldBe log1
+      spell.matchLcs(cls, seq("ABCDEFGHIJKL")).get shouldBe log2
     }
 
   }
